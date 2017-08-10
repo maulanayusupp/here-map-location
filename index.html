@@ -10,9 +10,47 @@
   <script type="text/javascript" src="https://js.cit.api.here.com/v3/3.0/mapsjs-mapevents.js"></script>
 </head>
 <body>
+  <button id="drop-in">Drop In</button>
   <div id="map" style="width: 100%; height: 400px; background: grey" />
   <script  type="text/javascript" charset="UTF-8" >
+function btnDropInClicked () {
+  window.onload = function(){
+    document.getElementById("drop-in").addEventListener("click", myFunction);
 
+    function myFunction() {
+      // Add the click event listener.
+      var lat=-6.864856, lng=107.579930;
+      addDraggableMarker(map, behavior, lat, lng);
+    }
+  };
+};
+
+
+
+
+/*function createGraphicsMarker(map) {
+  var graphicsContext = new nokia.maps.gfx.Graphics(),
+    my_fill_color = nokia.maps.gfx.Color.compress(255, 0, 0, 127),
+    myGfxMarker;
+
+  graphicsContext.beginImage(64, 64);
+  graphicsContext.set('fillColor', my_fill_color);
+  graphicsContext.set('strokeColor', '#000');
+  graphicsContext.set('lineWidth', 4);
+  graphicsContext.drawEllipse(1, 1, 48, 48);
+  graphicsContext.fill();
+  graphicsContext.stroke();
+
+  myGfxMarker = new nokia.maps.map.Marker(
+    {latitude:-6.864856, longitude:107.579930},
+    {icon: new nokia.maps.gfx.GraphicsImage(graphicsContext.getIDL()),
+      visibility: true,
+      anchor: new nokia.maps.util.Point(0, 0),
+      draggable: true}
+  );
+  map.objects.add(myGfxMarker);
+}
+createGraphicsMarker(map);*/
 /**
  * Adds a  draggable marker to the map..
  *
@@ -21,17 +59,36 @@
  * @param {H.mapevents.Behavior} behavior  Behavior implements
  *                                         default interactions for pan/zoom
  */
-function addDraggableMarker(map, behavior){
+function addDraggableMarker(map, behavior, lat, lng){
 
-  var marker = new H.map.Marker({lat:-6.864856, lng:107.579930});
+  var marker = new H.map.Marker({lat:lat, lng:lng});
   // Ensure that the marker can receive drag events
   marker.draggable = true;
   map.addObject(marker);
+
+
+  var area = new H.map.Circle(
+    // The central point of the circle
+    {lat:lat, lng:lng},
+    // The radius of the circle in meters
+    1000,
+    {
+      style: {
+        strokeColor: 'rgba(55, 85, 170, 0.6)', // Color of the perimeter
+        lineWidth: 1,
+        fillColor: 'rgba(8, 138, 254, 0.43)'  // Color of the circle
+      }
+    }
+  );
+  marker.draggable = true;
+  map.addObject(area);
+
 
   // disable the default draggability of the underlying map
   // when starting to drag a marker object:
   map.addEventListener('dragstart', function(ev) {
     var target = ev.target;
+    var coord = map.screenToGeo(ev.currentPointer.viewportX, ev.currentPointer.viewportY);
     console.log("start")
     // console.log(target)
     if (target instanceof H.map.Marker) {
@@ -81,6 +138,7 @@ function setUpClickListener(map) {
   // obtain the coordinates and display in an alert box.
   map.addEventListener('tap', function (evt) {
     var coord = map.screenToGeo(evt.currentPointer.viewportX, evt.currentPointer.viewportY);
+    addDraggableMarker(map, behavior, coord.lat, coord.lng);
     // console.log(coord)
     /*alert('Clicked at ' + Math.abs(coord.lat.toFixed(4)) +
         ((coord.lat > 0) ? 'N' : 'S') +
@@ -117,9 +175,9 @@ var behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
 // Step 4: Create the default UI:
 var ui = H.ui.UI.createDefault(map, defaultLayers, 'en-US');
 
-// Add the click event listener.
-addDraggableMarker(map, behavior);
+/* setup click listener */
 setUpClickListener(map);
+btnDropInClicked();
   </script>
 </body>
 </html>
