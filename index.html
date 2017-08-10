@@ -60,11 +60,15 @@ createGraphicsMarker(map);*/
  *                                         default interactions for pan/zoom
  */
 function addDraggableMarker(map, behavior, lat, lng){
+  // Create a group that can hold map objects:
+  group = new H.map.Group();
+  // Add the group to the map object (created earlier):
+  map.addObject(group);
 
   var marker = new H.map.Marker({lat:lat, lng:lng});
   // Ensure that the marker can receive drag events
   marker.draggable = true;
-  map.addObject(marker);
+  group.addObject(marker);
 
 
   var area = new H.map.Circle(
@@ -80,8 +84,10 @@ function addDraggableMarker(map, behavior, lat, lng){
       }
     }
   );
-  marker.draggable = true;
-  map.addObject(area);
+  area.draggable = true;
+  group.addObject(area);
+
+  // area.set("center", [-6.864856, 107.579930])
 
 
   // disable the default draggability of the underlying map
@@ -89,6 +95,7 @@ function addDraggableMarker(map, behavior, lat, lng){
   map.addEventListener('dragstart', function(ev) {
     var target = ev.target;
     var coord = map.screenToGeo(ev.currentPointer.viewportX, ev.currentPointer.viewportY);
+
     console.log("start")
     // console.log(target)
     if (target instanceof H.map.Marker) {
@@ -164,7 +171,7 @@ var defaultLayers = platform.createDefaultLayers();
 var map = new H.Map(document.getElementById('map'),
   defaultLayers.normal.map,{
   center: {lat:-6.864856, lng:107.579930},
-  zoom: 12
+  zoom: 13
 });
 
 //Step 3: make the map interactive
