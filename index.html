@@ -3,14 +3,27 @@
 <title>Here Map Location</title>
 <head>
   <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+
   <link rel="stylesheet" type="text/css" href="https://js.cit.api.here.com/v3/3.0/mapsjs-ui.css" />
   <script type="text/javascript" src="https://js.cit.api.here.com/v3/3.0/mapsjs-core.js"></script>
   <script type="text/javascript" src="https://js.cit.api.here.com/v3/3.0/mapsjs-service.js"></script>
   <script type="text/javascript" src="https://js.cit.api.here.com/v3/3.0/mapsjs-ui.js"></script>
   <script type="text/javascript" src="https://js.cit.api.here.com/v3/3.0/mapsjs-mapevents.js"></script>
+  <style type="text/css">
+    .info-container {
+      min-width: 500px !important;
+      max-width: 700px !important;
+    }
+    .pull-left,
+    .pull-right {
+      display: inline-block !important;
+    }
+  </style>
 </head>
 <body>
-  <button id="drop-in">Drop In</button>
+  <div class="btn btn-primary btn-block" id="drop-in">Drop In</div>
   <div id="map" style="width: 100%; height: 400px; background: grey" />
   <script  type="text/javascript" charset="UTF-8" >
 function btnDropInClicked () {
@@ -60,14 +73,47 @@ createGraphicsMarker(map);*/
  *                                         default interactions for pan/zoom
  */
 function addDraggableMarker(map, behavior, lat, lng){
+  var dragged = false;
   // Create a group that can hold map objects:
-  group = new H.map.Group();
+  var group = new H.map.Group();
   // Add the group to the map object (created earlier):
   map.addObject(group);
+
+
+  // add 'tap' event listener, that opens info bubble, to the group
+  group.addEventListener('tap', function (evt) {
+    // event target is the marker itself, group is a parent event target
+    // for all objects that it contains
+    var bubble =  new H.ui.InfoBubble(evt.target.getPosition(), {
+      // read custom data
+      content: evt.target.getData()
+    });
+    // show info bubble
+    ui.addBubble(bubble);
+  }, false);
+
+  var html = `
+              <div class="info-container clearfix">
+                <div class="pull-left">
+                  <a href=\'http://pixelhouse.id/\' target="blank">
+                    <div class="btn btn-warning">Pixel House Studio</div>
+                  </a>
+                </div>
+                <div class="pull-right">
+                  <a href=\'http://managix.id/\' target="blank">
+                    <div class="btn btn-primary">Managix</div>
+                  </a>
+                </div>
+              </div>
+              <div>
+                Jl. Gegerkalong Tonggoh III No.15, Gegerkalong, Sukasari, Kota Bandung, Jawa Barat 40153, Indonesia
+              </div>
+              `;
 
   var marker = new H.map.Marker({lat:lat, lng:lng});
   // Ensure that the marker can receive drag events
   marker.draggable = true;
+  marker.setData(html);
   group.addObject(marker);
 
 
@@ -84,7 +130,6 @@ function addDraggableMarker(map, behavior, lat, lng){
       }
     }
   );
-  area.draggable = true;
   group.addObject(area);
 
   // area.set("center", [-6.864856, 107.579930])
@@ -93,11 +138,12 @@ function addDraggableMarker(map, behavior, lat, lng){
   // disable the default draggability of the underlying map
   // when starting to drag a marker object:
   map.addEventListener('dragstart', function(ev) {
+    dragged = true;
     var target = ev.target;
     var coord = map.screenToGeo(ev.currentPointer.viewportX, ev.currentPointer.viewportY);
 
     console.log("start")
-    // console.log(target)
+    group.removeObject(area);
     if (target instanceof H.map.Marker) {
       behavior.disable();
     }
@@ -112,6 +158,27 @@ function addDraggableMarker(map, behavior, lat, lng){
 
     var coord = map.screenToGeo(ev.currentPointer.viewportX, ev.currentPointer.viewportY);
     console.log(coord)
+
+
+    if (dragged) {
+      area = new H.map.Circle(
+        // The central point of the circle
+        {lat:coord.lat, lng:coord.lng},
+        // The radius of the circle in meters
+        1000,
+        {
+          style: {
+            strokeColor: 'rgba(55, 85, 170, 0.6)', // Color of the perimeter
+            lineWidth: 1,
+            fillColor: 'rgba(8, 138, 254, 0.43)'  // Color of the circle
+          }
+        }
+      );
+      group.addObject(area);
+    }
+    dragged = false;
+
+
     if (target instanceof mapsjs.map.Marker) {
       behavior.enable();
     }
@@ -145,7 +212,7 @@ function setUpClickListener(map) {
   // obtain the coordinates and display in an alert box.
   map.addEventListener('tap', function (evt) {
     var coord = map.screenToGeo(evt.currentPointer.viewportX, evt.currentPointer.viewportY);
-    addDraggableMarker(map, behavior, coord.lat, coord.lng);
+    // addDraggableMarker(map, behavior, coord.lat, coord.lng);
     // console.log(coord)
     /*alert('Clicked at ' + Math.abs(coord.lat.toFixed(4)) +
         ((coord.lat > 0) ? 'N' : 'S') +
