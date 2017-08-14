@@ -24,10 +24,13 @@
 </head>
 <body>
   <div class="btn btn-primary btn-block" id="drop-in">Drop In</div>
+  <div class="btn btn-danger btn-block" id="remove-marker">Remove Marker</div>
   <div id="map" style="width: 100%; height: 400px; background: grey" />
   <script  type="text/javascript" charset="UTF-8" >
+    var myMaps = [];
+    var map_id = 0;
     // drop in marker
-    function btnDropInClicked () {
+    function ButtonEventListener () {
       window.onload = function(){
         document.getElementById("drop-in").addEventListener("click", myFunction);
 
@@ -36,8 +39,24 @@
           var lat=-6.864856, lng=107.579930;
           addDraggableMarker(map, behavior, lat, lng);
         }
+
+        document.getElementById("remove-marker").addEventListener("click", onRemove);
+        function onRemove() {
+          // Add the click event listener.
+          for (var i = 0; i < myMaps.length; i++) {
+            var current = myMaps[i];
+            if (i == myMaps.length-1) {
+              console.log("remove")
+              map.removeObject(current.group);
+              myMaps.splice(i, 1);
+            }
+          }
+
+        }
       };
     };
+
+
 
     /**
      * Adds a  draggable marker to the map..
@@ -48,6 +67,7 @@
      *                                         default interactions for pan/zoom
      */
     function addDraggableMarker(map, behavior, lat, lng){
+      map_id++;
       var dragged = false;
       // Create a group that can hold map objects:
       var group = new H.map.Group();
@@ -171,6 +191,12 @@
           target.setPosition(map.screenToGeo(pointer.viewportX, pointer.viewportY));
         }
       }, false);
+
+       /* push to array */
+      myMaps.push({
+        id: map_id,
+        group: group
+      })
     }
 
     /**
@@ -218,7 +244,7 @@
 
     /* setup click listener */
     setUpClickListener(map);
-    btnDropInClicked();
+    ButtonEventListener();
   </script>
 </body>
 </html>
