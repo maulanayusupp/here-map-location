@@ -25,38 +25,110 @@
 <body>
   <div class="btn btn-primary btn-block" id="drop-in">Drop In</div>
   <div class="btn btn-danger btn-block" id="remove-marker">Remove Marker</div>
+  <div class="btn btn-warning btn-block" id="change-radius">Change Radius</div>
   <div id="map" style="width: 100%; height: 400px; background: grey" />
   <script  type="text/javascript" charset="UTF-8" >
-    var myMaps = [];
-    var map_id = 0;
+    var myMarkers = [];
     // drop in marker
     function ButtonEventListener () {
       window.onload = function(){
-        document.getElementById("drop-in").addEventListener("click", myFunction);
+        document.getElementById("drop-in").addEventListener("click", onDropMarker);
 
-        function myFunction() {
+        /* on drop */
+        function onDropMarker() {
           // Add the click event listener.
           var lat=-6.864856, lng=107.579930;
           addDraggableMarker(map, behavior, lat, lng);
         }
 
+        /* remove marker */
         document.getElementById("remove-marker").addEventListener("click", onRemove);
         function onRemove() {
           // Add the click event listener.
-          for (var i = 0; i < myMaps.length; i++) {
-            var current = myMaps[i];
-            if (i == myMaps.length-1) {
+          for (var i = 0; i < myMarkers.length; i++) {
+            var current = myMarkers[i];
+            if (i == myMarkers.length-1) {
               console.log("remove")
               map.removeObject(current.group);
-              myMaps.splice(i, 1);
+              myMarkers.splice(i, 1);
             }
           }
-
         }
+
+        /* change radius */
+        document.getElementById("change-radius").addEventListener("click", onChangeRadius);
+        function onChangeRadius() {
+          // Add the click event listener.
+          for (var i = 0; i < myMarkers.length; i++) {
+            var current = myMarkers[i];
+
+            if (i == myMarkers.length-1) {
+              console.log("change radius")
+              current.group.removeObject(current.area);
+              var radius = 2000;
+              var area = new H.map.Circle(
+                // The central point of the circle
+                {lat:current.lat, lng:current.lng},
+                // The radius of the circle in meters
+                radius,
+                {
+                  style: {
+                    strokeColor: 'rgba(55, 85, 170, 0.6)', // Color of the perimeter
+                    lineWidth: 1,
+                    fillColor: 'rgba(8, 138, 254, 0.43)'  // Color of the circle
+                  }
+                }
+              );
+              current.group.addObject(area);
+              current.area = area;
+              current.radius = radius;
+            }
+          }
+        }
+
       };
     };
 
+    function removeArea(markerID){
+      for (var i = 0; i < myMarkers.length; i++) {
+        var current = myMarkers[i];
 
+        if (current.id == markerID) {
+          console.log("remove area")
+          current.group.removeObject(current.area);
+          break;
+        }
+      }
+    };
+
+    function changeArea(markerID, lat, lng){
+      for (var i = 0; i < myMarkers.length; i++) {
+        var current = myMarkers[i];
+
+        if (current.id == markerID) {
+          console.log("add area")
+
+          var area = new H.map.Circle(
+            // The central point of the circle
+            {lat:lat, lng:lng},
+            // The radius of the circle in meters
+            current.radius,
+            {
+              style: {
+                strokeColor: 'rgba(55, 85, 170, 0.6)', // Color of the perimeter
+                lineWidth: 1,
+                fillColor: 'rgba(8, 138, 254, 0.43)'  // Color of the circle
+              }
+            }
+          );
+          current.group.addObject(area);
+          current.area = area;
+          current.lat = lat;
+          current.lng = lng;
+          break;
+        }
+      }
+    };
 
     /**
      * Adds a  draggable marker to the map..
@@ -67,32 +139,31 @@
      *                                         default interactions for pan/zoom
      */
     function addDraggableMarker(map, behavior, lat, lng){
-      map_id++;
+      var radius = 1000;
       var dragged = false;
       // Create a group that can hold map objects:
       var group = new H.map.Group();
-
+      var markerID = group.getId();
       // Add the group to the map object (created earlier):
       map.addObject(group);
 
-      /*// add 'tap' event listener, that opens info bubble, to the group
+      // add 'tap' event listener, that opens info bubble, to the group
       group.addEventListener('tap', function (evt) {
         // event target is the marker itself, group is a parent event target
         // for all objects that it contains
+
         var bubble =  new H.ui.InfoBubble(evt.target.getPosition(), {
           // read custom data
           content: evt.target.getData()
         });
         // show info bubble
         ui.addBubble(bubble);
-      }, false);*/
+      }, false);
 
       var html = `
                     <div class="info-container clearfix">
                       <div class="pull-left">
-                        <a href=\'http://pixelhouse.id/\' target="blank">
                           <div class="btn btn-warning">Pixel House Studio</div>
-                        </a>
                       </div>
                       <div class="pull-right">
                         <a href=\'http://managix.id/\' target="blank">
@@ -107,6 +178,7 @@
 
       // create marker
       var marker = new H.map.Marker({lat:lat, lng:lng});
+
       // Ensure that the marker can receive drag events
       marker.draggable = true;
       marker.setData(html);
@@ -117,7 +189,7 @@
         // The central point of the circle
         {lat:lat, lng:lng},
         // The radius of the circle in meters
-        1000,
+        radius,
         {
           style: {
             strokeColor: 'rgba(55, 85, 170, 0.6)', // Color of the perimeter
@@ -131,12 +203,15 @@
       // disable the default draggability of the underlying map
       // when starting to drag a marker object:
       group.addEventListener('dragstart', function(ev) {
+        console.log("Start Dragged - Marker ID: " + markerID);
+
         dragged = true;
         var target = ev.target;
+
         var coord = map.screenToGeo(ev.currentPointer.viewportX, ev.currentPointer.viewportY);
 
-        console.log("start")
-        group.removeObject(area);
+        removeArea(markerID);
+
         if (target instanceof H.map.Marker) {
           behavior.disable();
         }
@@ -150,23 +225,9 @@
         console.log("dragged")
 
         var coord = map.screenToGeo(ev.currentPointer.viewportX, ev.currentPointer.viewportY);
-        console.log(coord)
 
         if (dragged) {
-          area = new H.map.Circle(
-            // The central point of the circle
-            {lat:coord.lat, lng:coord.lng},
-            // The radius of the circle in meters
-            1000,
-            {
-              style: {
-                strokeColor: 'rgba(55, 85, 170, 0.6)', // Color of the perimeter
-                lineWidth: 1,
-                fillColor: 'rgba(8, 138, 254, 0.43)'  // Color of the circle
-              }
-            }
-          );
-          group.addObject(area);
+          changeArea(markerID, coord.lat, coord.lng);
         }
         dragged = false;
 
@@ -178,7 +239,7 @@
 
       // Listen to the drag event and move the position of the marker
       // as necessary
-       group.addEventListener('drag', function(ev) {
+      group.addEventListener('drag', function(ev) {
         var target = ev.target,
             pointer = ev.currentPointer;
 
@@ -192,10 +253,15 @@
         }
       }, false);
 
+
        /* push to array */
-      myMaps.push({
-        id: map_id,
-        group: group
+      myMarkers.push({
+        id: markerID,
+        group: group,
+        area: area,
+        radius: radius,
+        lat: lat,
+        lng: lng
       })
     }
 
