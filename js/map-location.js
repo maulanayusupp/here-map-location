@@ -95,7 +95,6 @@ var MapLocation = function (config) {
 	  	group.addEventListener('tap', function (evt) {
 	    	selectedGroupID = group.getId();
 	    	var bubble =  new H.ui.InfoBubble(evt.target.getPosition(), {
-	      		// read custom data
 	      		content: evt.target.getData()
 	    	});
 	    	// show info bubble
@@ -104,12 +103,12 @@ var MapLocation = function (config) {
 
 	  	var html = `
 	                <div class="info-container clearfix">
-	                  <div class="pull-left">
-	                      <div class="btn btn-warning">Pixel House Studio</div>
+	                  <div class="float-left">
+	                      <div class="btn btn-sm btn-warning">Pixel House Studio</div>
 	                  </div>
-	                  <div class="pull-right">
+	                  <div class="float-right">
 	                    <a href=\'http://managix.id/\' target="blank">
-	                      <div class="btn btn-primary">Managix</div>
+	                      <div class="btn btn-sm btn-primary">Managix</div>
 	                    </a>
 	                  </div>
 	                </div>
