@@ -73,6 +73,7 @@
       var myMarkers = [];
       var locationCounter = 0;
       var markerID = 0;
+      var selectedGroupID = '';
 
       /* Step 1: initialize communication with the platform */
       var platform = new H.service.Platform({
@@ -164,7 +165,7 @@
       function onRemoveMarker(){
         for (var i = 0; i < myMarkers.length; i++) {
           var current = myMarkers[i];
-          if (i == myMarkers.length-1) {
+          if (current.group_id == selectedGroupID) {
             console.log("remove")
             map.removeObject(current.group);
             myMarkers.splice(i, 1);
@@ -185,14 +186,14 @@
         for (var i = 0; i < myMarkers.length; i++) {
           var current = myMarkers[i];
 
-          if (i == myMarkers.length-1) {
+          if (current.group_id == selectedGroupID) {
             console.log("change radius")
             current.group.removeObject(current.area);
-            var radius = 2000;
+            var radius = current.radius + 100;
             var area = new H.map.Circle(
-              // The central point of the circle
+              /* position center */
               {lat:current.lat, lng:current.lng},
-              // The radius of the circle in meters
+              /*radius */
               radius,
               {
                 style: {
@@ -213,7 +214,7 @@
       function removeArea(groupID){
         for (var i = 0; i < myMarkers.length; i++) {
           var current = myMarkers[i];
-          if (current.id == groupID) {
+          if (current.group_id == groupID) {
             current.group.removeObject(current.area);
             break;
           }
@@ -225,9 +226,11 @@
         for (var i = 0; i < myMarkers.length; i++) {
           var current = myMarkers[i];
 
-          if (current.id == groupID) {
+          if (current.group_id == groupID) {
             var area = new H.map.Circle(
+              /* position center */
               {lat:lat, lng:lng},
+              /*radius */
               current.radius,
               {
                 style: {
@@ -251,17 +254,17 @@
         markerID++;
         var radius = 1000;
         var dragged = false;
-        // Create a group that can hold map objects:
+
+        /* create group object */
         var group = new H.map.Group();
         var groupID = group.getId();
-        // Add the group to the map object (created earlier):
+
+        /* add group to the map object */
         map.addObject(group);
 
-        // add 'tap' event listener, that opens info bubble, to the group
+        /* event tap for bubble info */
         group.addEventListener('tap', function (evt) {
-          // event target is the marker itself, group is a parent event target
-          // for all objects that it contains
-
+          selectedGroupID = group.getId();
           var bubble =  new H.ui.InfoBubble(evt.target.getPosition(), {
             // read custom data
             content: evt.target.getData()
@@ -314,6 +317,7 @@
         // when starting to drag a marker object:
         group.addEventListener('dragstart', function(ev) {
           console.log("Start Dragged - Group ID: " + groupID);
+          selectedGroupID = group.getId();
           dragged = true;
           var target = ev.target;
 
