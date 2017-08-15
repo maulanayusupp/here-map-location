@@ -56,7 +56,7 @@ var MapLocation = function (config) {
 	/* init drop marker */
 	function initDropMarker(){
 	  	self.$container.find('.map-drop-in').on('click', function(event) {
-	  		var _item = $(this);
+	 		var _item = $(this);
 	   		if (dropped) {
 	   			dropped = false;
 	   			_item.html('Drop In');
@@ -65,6 +65,17 @@ var MapLocation = function (config) {
 	   			_item.html('Droped');
 	   		}
 	  	});
+	}
+
+	/* check dropin marker */
+	function checkDropMarker() {
+   		if (dropped) {
+   			dropped = false;
+   			self.$container.find('.map-drop-in').html('Drop In');
+   		} else {
+   			dropped = true;
+   			self.$container.find('.map-drop-in').html('Droped');
+   		}
 	}
 
 	/* add draggable marker */
@@ -197,6 +208,7 @@ var MapLocation = function (config) {
 	      	var lng = coords.lng;
 	      	if (dropped) {
 		      	addDraggableMarker(map, behavior, lat, lng);
+		      	checkDropMarker();
 		    }
 	    }, false);
 	}
