@@ -1,5 +1,6 @@
 var MapLocation = function (config) {
 	var self = this;
+	self.config = config;
 	self.$container = $('#' + config.id);
 	console.log(config.id)
 	var locationCounter = config.mapCounter;
@@ -23,32 +24,32 @@ var MapLocation = function (config) {
 	  	var dom  = $(`
 	              	<div class="container map-variation">
 	                	<div class="map-container">
-	                  	<div class="card">
-	                    	<div class="card-header">
-								<div class="float-left">
-									Location ${locationCounter}
-								</div>
-	                      		<div class="btn btn-danger btn-sm btn-remove-map-location float-right">
-	                      			Remove Map
-	                      		</div>
-	                    	</div>
-	                    <div class="card-body">
-	                      	<div class="row">
-	                        	<div class="col-sm-2">
-	                          	<div class="btn btn-sm btn-primary btn-block map-drop-in" >Drop In</div>
-	                          	<div class="btn btn-sm btn-danger btn-block map-remove-marker">Remove Marker</div>
-	                          	<div class="btn btn-sm btn-warning btn-block map-change-radius" >Change Radius</div>
-	                        </div>
-	                        <div class="col-sm-10">
-	                          	<div id="map-container">
-	                        	    <div id="${mapID}" class="map-location" /></div>
-	                        	</div>
-	                        </div>
-	                      </div>
-	                    </div>
-	                  </div>
-	                </div>
-	              </div>
+		                  	<div class="card">
+		                    	<div class="card-header">
+									<div class="float-left">
+										Location ${locationCounter}
+									</div>
+		                      		<div class="btn btn-danger btn-sm btn-remove-map-location float-right">
+		                      			Remove Map
+		                      		</div>
+		                    	</div>
+			                    <div class="card-body">
+			                      	<div class="row">
+			                        	<div class="col-sm-2">
+			                          	<div class="btn btn-sm btn-primary btn-block map-drop-in" >Drop In</div>
+			                          	<div class="btn btn-sm btn-danger btn-block map-remove-marker">Remove Marker</div>
+			                          	<div class="btn btn-sm btn-warning btn-block map-change-radius" >Change Radius</div>
+			                        </div>
+			                        <div class="col-sm-10">
+			                          	<div id="map-container">
+			                        	    <div id="${mapID}" class="map-location" /></div>
+			                        	</div>
+			                        </div>
+			                      </div>
+			                    </div>
+		                  	</div>
+	                	</div>
+	              	</div>
 	            `);
 	  	self.$container.append(dom);
 	}
@@ -296,6 +297,16 @@ var MapLocation = function (config) {
 	  }
 	};
 
+	/* remove map */
+	function initRemoveMap(){
+	  	self.$container.find('.btn-remove-map-location').on('click', function(event) {
+	    	const itemDom = $(this).closest('.map-variation');
+			const index = itemDom.index();
+			self.config.onRemove(index);
+			itemDom.remove();
+	  	});
+	}
+
 	/* connection to here map */
 	function connection() {
 	  /* Step 1: initialize communication with the platform */
@@ -325,6 +336,7 @@ var MapLocation = function (config) {
 	connection();
 	initDropMarker();
 	initRemoveMarker();
+	initRemoveMap();
 	initChangeRadius();
 	clickListener(map);
 }
