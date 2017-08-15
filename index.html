@@ -10,6 +10,9 @@
     .map-container {
       padding-bottom: 10px;
     }
+    .map-container:first-child .btn-remove-map-location {
+      display: none;
+    }
     .info-container {
       min-width: 500px !important;
       max-width: 700px !important;
@@ -21,77 +24,43 @@
   </style>
 </head>
 <body>
-  <div class="container map-container">
-    <div class="card">
-      <div class="card-header">
-        Location 1
-      </div>
-      <div class="card-body">
-        <div class="row">
-          <div class="col-sm-2">
-            <div class="btn btn-primary btn-block" id="map1-drop-in">Drop In</div>
-            <div class="btn btn-danger btn-block" id="map1-remove-marker">Remove Marker</div>
-            <div class="btn btn-warning btn-block" id="map1-change-radius">Change Radius</div>
-          </div>
-          <div class="col-sm-10">
-            <div id="map-container">
-              <div id="map1" style="width: 100%; height: 300px; background: grey" /></div>
+
+  <div id="location-field">
+    <div class="container map-container">
+      <div class="card">
+        <div class="card-header">
+          Location 1
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-sm-2">
+              <div class="btn btn-primary btn-block" id="map1-drop-in">Drop In</div>
+              <div class="btn btn-danger btn-block" id="map1-remove-marker">Remove Marker</div>
+              <div class="btn btn-warning btn-block" id="map1-change-radius">Change Radius</div>
+              <div class="btn btn-danger btn-block btn-remove-map-location">Remove Map</div>
+            </div>
+            <div class="col-sm-10">
+              <div id="map-container">
+                <div id="map1" style="width: 100%; height: 300px; background: grey" /></div>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-
-  <div class="container map-container">
-    <div class="card">
-      <div class="card-header">
-        Location 2
-      </div>
-      <div class="card-body">
-        <div class="row">
-          <div class="col-sm-2">
-            <div class="btn btn-primary btn-block" id="map2-drop-in">Drop In</div>
-            <div class="btn btn-danger btn-block" id="map2-remove-marker">Remove Marker</div>
-            <div class="btn btn-warning btn-block" id="map2-change-radius">Change Radius</div>
-          </div>
-          <div class="col-sm-10">
-            <div id="map-container">
-              <div id="map2" style="width: 100%; height: 300px; background: grey" /></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="container map-container">
-    <div class="card">
-    <div class="card-header">
-      Location 3
-    </div>
-      <div class="card-body">
-        <div class="row">
-          <div class="col-sm-2">
-            <div class="btn btn-primary btn-block" id="map3-drop-in">Drop In</div>
-            <div class="btn btn-danger btn-block" id="map3-remove-marker">Remove Marker</div>
-            <div class="btn btn-warning btn-block" id="map3-change-radius">Change Radius</div>
-          </div>
-          <div class="col-sm-10">
-            <div id="map-container">
-              <div id="map3" style="width: 100%; height: 300px; background: grey" /></div>
-            </div>
-          </div>
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="btn btn-primary" id="add-location">
+          + Add Location
         </div>
       </div>
     </div>
   </div>
 
 
-
-
-
-
+  <!-- script -->
   <script type="text/javascript" src="vendor/jquery/jquery-3.2.1.min.js"></script>
   <script type="text/javascript" src="https://js.cit.api.here.com/v3/3.0/mapsjs-core.js"></script>
   <script type="text/javascript" src="https://js.cit.api.here.com/v3/3.0/mapsjs-service.js"></script>
@@ -99,304 +68,319 @@
   <script type="text/javascript" src="https://js.cit.api.here.com/v3/3.0/mapsjs-mapevents.js"></script>
 
   <script  type="text/javascript" charset="UTF-8" >
+    $(document).ready(function() {
+      /* global variable */
+      var myMarkers = [];
+      var locationCounter = 0;
+      var markerID = 0;
 
-    /* global variable */
-    var myMarkers = [];
-
-    /* button event listener */
-    function ButtonEventListener () {
-      window.onload = function(){
-
-        /* on drop */
-        document.getElementById("map1-drop-in").addEventListener("click", onDropMarker);
-        function onDropMarker() {
-          // Add the click event listener.
-          var lat=-6.864856, lng=107.579930;
-          addDraggableMarker(map, behavior, lat, lng);
-        }
-
-        /* remove marker */
-        document.getElementById("map1-remove-marker").addEventListener("click", onRemove);
-        function onRemove() {
-          // Add the click event listener.
-          for (var i = 0; i < myMarkers.length; i++) {
-            var current = myMarkers[i];
-            if (i == myMarkers.length-1) {
-              console.log("remove")
-              map.removeObject(current.group);
-              myMarkers.splice(i, 1);
-            }
-          }
-        }
-
-        /* change radius */
-        document.getElementById("map1-change-radius").addEventListener("click", onChangeRadius);
-        function onChangeRadius() {
-          // Add the click event listener.
-          for (var i = 0; i < myMarkers.length; i++) {
-            var current = myMarkers[i];
-
-            if (i == myMarkers.length-1) {
-              console.log("change radius")
-              current.group.removeObject(current.area);
-              var radius = 2000;
-              var area = new H.map.Circle(
-                // The central point of the circle
-                {lat:current.lat, lng:current.lng},
-                // The radius of the circle in meters
-                radius,
-                {
-                  style: {
-                    strokeColor: 'rgba(55, 85, 170, 0.6)', // Color of the perimeter
-                    lineWidth: 1,
-                    fillColor: 'rgba(8, 138, 254, 0.43)'  // Color of the circle
-                  }
-                }
-              );
-              current.group.addObject(area);
-              current.area = area;
-              current.radius = radius;
-            }
-          }
-        }
-
-      };
-    };
-
-    /* remove area in group */
-    function removeArea(markerID){
-      for (var i = 0; i < myMarkers.length; i++) {
-        var current = myMarkers[i];
-
-        if (current.id == markerID) {
-          console.log("remove area")
-          current.group.removeObject(current.area);
-          break;
-        }
-      }
-    };
-
-    /* change area in group */
-    function changeArea(markerID, lat, lng){
-      for (var i = 0; i < myMarkers.length; i++) {
-        var current = myMarkers[i];
-
-        if (current.id == markerID) {
-          console.log("add area")
-
-          var area = new H.map.Circle(
-            // The central point of the circle
-            {lat:lat, lng:lng},
-            // The radius of the circle in meters
-            current.radius,
-            {
-              style: {
-                strokeColor: 'rgba(55, 85, 170, 0.6)', // Color of the perimeter
-                lineWidth: 1,
-                fillColor: 'rgba(8, 138, 254, 0.43)'  // Color of the circle
-              }
-            }
-          );
-          current.group.addObject(area);
-          current.area = area;
-          current.lat = lat;
-          current.lng = lng;
-          console.log(current)
-          break;
-        }
-      }
-    };
-
-    /**
-     * Adds a  draggable marker to the map..
-     *
-     * @param {H.Map} map                      A HERE Map instance within the
-     *                                         application
-     * @param {H.mapevents.Behavior} behavior  Behavior implements
-     *                                         default interactions for pan/zoom
-     */
-    function addDraggableMarker(map, behavior, lat, lng){
-      var radius = 1000;
-      var dragged = false;
-      // Create a group that can hold map objects:
-      var group = new H.map.Group();
-      var markerID = group.getId();
-      // Add the group to the map object (created earlier):
-      map.addObject(group);
-
-      // add 'tap' event listener, that opens info bubble, to the group
-      group.addEventListener('tap', function (evt) {
-        // event target is the marker itself, group is a parent event target
-        // for all objects that it contains
-
-        var bubble =  new H.ui.InfoBubble(evt.target.getPosition(), {
-          // read custom data
-          content: evt.target.getData()
-        });
-        // show info bubble
-        ui.addBubble(bubble);
-      }, false);
-
-      var html = `
-                    <div class="info-container clearfix">
-                      <div class="pull-left">
-                          <div class="btn btn-warning">Pixel House Studio</div>
-                      </div>
-                      <div class="pull-right">
-                        <a href=\'http://managix.id/\' target="blank">
-                          <div class="btn btn-primary">Managix</div>
-                        </a>
-                      </div>
-                    </div>
-                    <div>
-                      Jl. Gegerkalong Tonggoh III No.15, Gegerkalong, Sukasari, Kota Bandung, Jawa Barat 40153, Indonesia
-                    </div>
-                  `;
-
-      // create marker
-      var marker = new H.map.Marker({lat:lat, lng:lng});
-
-      // Ensure that the marker can receive drag events
-      marker.draggable = true;
-      marker.setData(html);
-      group.addObject(marker);
-
-      // create area in marker
-      var area = new H.map.Circle(
-        // The central point of the circle
-        {lat:lat, lng:lng},
-        // The radius of the circle in meters
-        radius,
-        {
-          style: {
-            strokeColor: 'rgba(55, 85, 170, 0.6)', // Color of the perimeter
-            lineWidth: 1,
-            fillColor: 'rgba(8, 138, 254, 0.43)'  // Color of the circle
-          }
-        }
-      );
-      group.addObject(area);
-
-      // disable the default draggability of the underlying map
-      // when starting to drag a marker object:
-      group.addEventListener('dragstart', function(ev) {
-        console.log("Start Dragged - Marker ID: " + markerID);
-        dragged = true;
-        var target = ev.target;
-
-        var coord = map.screenToGeo(ev.currentPointer.viewportX, ev.currentPointer.viewportY);
-
-        removeArea(markerID);
-
-        if (target instanceof H.map.Marker) {
-          behavior.disable();
-        }
-      }, false);
-
-
-      // re-enable the default draggability of the underlying map
-      // when dragging has completed
-      group.addEventListener('dragend', function(ev) {
-        var target = ev.target;
-        console.log("dragged")
-
-        var coord = map.screenToGeo(ev.currentPointer.viewportX, ev.currentPointer.viewportY);
-
-        if (dragged) {
-          changeArea(markerID, coord.lat, coord.lng);
-        }
-        dragged = false;
-
-        if (target instanceof mapsjs.map.Marker) {
-          behavior.enable();
-        }
-      }, false);
-
-      // Listen to the drag event and move the position of the marker
-      // as necessary
-      group.addEventListener('drag', function(ev) {
-        var target = ev.target;
-        var pointer = ev.currentPointer;
-        // var coord = map.screenToGeo(ev.currentPointer.viewportX, ev.currentPointer.viewportY);
-        // console.log(coord)
-        if (target instanceof mapsjs.map.Marker) {
-          target.setPosition(map.screenToGeo(pointer.viewportX, pointer.viewportY));
-        }
-      }, false);
-
-
-       /* push to array */
-      myMarkers.push({
-        id: markerID,
-        group: group,
-        area: area,
-        radius: radius,
-        lat: lat,
-        lng: lng
-      })
-    }
-
-    /**
-     * An event listener is added to listen to tap events on the map.
-     * Clicking on the map displays an alert box containing the latitude and longitude
-     * of the location pressed.
-     * @param  {H.Map} map      A HERE Map instance within the application
-     */
-    function setUpClickListener(map) {
-      // Attach an event listener to map display
-      // obtain the coordinates and display in an alert box.
-      map.addEventListener('tap', function (evt) {
-        var coord = map.screenToGeo(evt.currentPointer.viewportX, evt.currentPointer.viewportY);
-        // addDraggableMarker(map, behavior, coord.lat, coord.lng);
-        // console.log(coord)
+      /* Step 1: initialize communication with the platform */
+      var platform = new H.service.Platform({
+        app_id: 'DemoAppId01082013GAL',
+        app_code: 'AJKnXv84fjrb0KIHawS0Tg',
+        useCIT: true,
+        useHTTPS: true
       });
-    }
+      var defaultLayers = platform.createDefaultLayers();
 
-    /**
-     * Boilerplate map initialization code starts below:
-     */
-    //Step 1: initialize communication with the platform
-    var platform = new H.service.Platform({
-      app_id: 'DemoAppId01082013GAL',
-      app_code: 'AJKnXv84fjrb0KIHawS0Tg',
-      useCIT: true,
-      useHTTPS: true
+      /* Step 2: initialize a map - this map is centered */
+      var map = new H.Map(document.getElementById('map1'),
+        defaultLayers.normal.map,{
+        center: {lat:-6.864856, lng:107.579930},
+        zoom: 13
+      });
+
+      /* Step 3: make the map interactive */
+      var behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
+
+      /* Step 4: Create the default UI */
+      var ui = H.ui.UI.createDefault(map, defaultLayers, 'en-US');
+
+      /* add location */
+      function initAddLocation() {
+        $('#add-location').on('click', function(event) {
+          onAddLocation();
+        });
+      }
+
+      /* on add location */
+      function onAddLocation() {
+        locationCounter++;
+        var dom = $(`
+                    <div class="container map-container">
+                      <div class="card">
+                        <div class="card-header">
+                          Location ${locationCounter}
+                        </div>
+                        <div class="card-body">
+                          <div class="row">
+                            <div class="col-sm-2">
+                              <div class="btn btn-primary btn-block" id="map2-drop-in">Drop In</div>
+                              <div class="btn btn-danger btn-block" id="map2-remove-marker">Remove Marker</div>
+                              <div class="btn btn-warning btn-block" id="map2-change-radius">Change Radius</div>
+                              <div class="btn btn-danger btn-block btn-remove-map-location">Remove Map</div>
+                            </div>
+                            <div class="col-sm-10">
+                              <div id="map-container">
+                                <div id="map2" style="width: 100%; height: 300px; background: grey" /></div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  `);
+        $('#location-field').append(dom);
+      }
+
+      /* remove map */
+      function initRemoveMap(){
+        $('body').on('click', '.btn-remove-map-location', function(event) {
+          $(this).closest('.map-container').remove();
+        });
+      }
+
+      /* init drop marker */
+      function initDropMarker(){
+        $('body').on('click', '#map1-drop-in', function(event) {
+          onDropMarker();
+        });
+      }
+
+      /* on drop marker */
+      function onDropMarker() {
+        var lat=-6.864856, lng=107.579930;
+        addDraggableMarker(map, behavior, lat, lng);
+      }
+
+      /* init remove marker */
+      function initRemoveMarker(){
+        $('body').on('click', '#map1-remove-marker', function(event) {
+          onRemoveMarker();
+        });
+      }
+
+      /* on remove marker */
+      function onRemoveMarker(){
+        for (var i = 0; i < myMarkers.length; i++) {
+          var current = myMarkers[i];
+          if (i == myMarkers.length-1) {
+            console.log("remove")
+            map.removeObject(current.group);
+            myMarkers.splice(i, 1);
+          }
+        }
+      }
+
+      /* init change radius */
+      function initChangeRadius(){
+        $('body').on('click', '#map1-change-radius', function(event) {
+          onChangeRadius();
+        });
+      }
+
+      /* on change radius in marker */
+      function onChangeRadius() {
+        // Add the click event listener.
+        for (var i = 0; i < myMarkers.length; i++) {
+          var current = myMarkers[i];
+
+          if (i == myMarkers.length-1) {
+            console.log("change radius")
+            current.group.removeObject(current.area);
+            var radius = 2000;
+            var area = new H.map.Circle(
+              // The central point of the circle
+              {lat:current.lat, lng:current.lng},
+              // The radius of the circle in meters
+              radius,
+              {
+                style: {
+                  strokeColor: 'rgba(55, 85, 170, 0.6)', // Color of the perimeter
+                  lineWidth: 1,
+                  fillColor: 'rgba(8, 138, 254, 0.43)'  // Color of the circle
+                }
+              }
+            );
+            current.group.addObject(area);
+            current.area = area;
+            current.radius = radius;
+          }
+        }
+      }
+
+      /* remove area in group */
+      function removeArea(groupID){
+        for (var i = 0; i < myMarkers.length; i++) {
+          var current = myMarkers[i];
+          if (current.id == groupID) {
+            current.group.removeObject(current.area);
+            break;
+          }
+        }
+      }
+
+      /* change area in group */
+      function changeArea(groupID, lat, lng){
+        for (var i = 0; i < myMarkers.length; i++) {
+          var current = myMarkers[i];
+
+          if (current.id == groupID) {
+            var area = new H.map.Circle(
+              {lat:lat, lng:lng},
+              current.radius,
+              {
+                style: {
+                  strokeColor: 'rgba(55, 85, 170, 0.6)', // Color of the perimeter
+                  lineWidth: 1,
+                  fillColor: 'rgba(8, 138, 254, 0.43)'  // Color of the circle
+                }
+              }
+            );
+            current.group.addObject(area);
+            current.area = area;
+            current.lat = lat;
+            current.lng = lng;
+            break;
+          }
+        }
+      };
+
+      /* add draggable marker */
+      function addDraggableMarker(map, behavior, lat, lng){
+        markerID++;
+        var radius = 1000;
+        var dragged = false;
+        // Create a group that can hold map objects:
+        var group = new H.map.Group();
+        var groupID = group.getId();
+        // Add the group to the map object (created earlier):
+        map.addObject(group);
+
+        // add 'tap' event listener, that opens info bubble, to the group
+        group.addEventListener('tap', function (evt) {
+          // event target is the marker itself, group is a parent event target
+          // for all objects that it contains
+
+          var bubble =  new H.ui.InfoBubble(evt.target.getPosition(), {
+            // read custom data
+            content: evt.target.getData()
+          });
+          // show info bubble
+          ui.addBubble(bubble);
+        }, false);
+
+        var html = `
+                      <div class="info-container clearfix">
+                        <div class="pull-left">
+                            <div class="btn btn-warning">Pixel House Studio</div>
+                        </div>
+                        <div class="pull-right">
+                          <a href=\'http://managix.id/\' target="blank">
+                            <div class="btn btn-primary">Managix</div>
+                          </a>
+                        </div>
+                      </div>
+                      <div>
+                        Jl. Gegerkalong Tonggoh III No.15, Gegerkalong, Sukasari, Kota Bandung, Jawa Barat 40153, Indonesia
+                      </div>
+                    `;
+
+        // create marker
+        var marker = new H.map.Marker({lat:lat, lng:lng});
+
+        // Ensure that the marker can receive drag events
+        marker.draggable = true;
+        marker.setData(html);
+        group.addObject(marker);
+
+        // create area in marker
+        var area = new H.map.Circle(
+          // The central point of the circle
+          {lat:lat, lng:lng},
+          // The radius of the circle in meters
+          radius,
+          {
+            style: {
+              strokeColor: 'rgba(55, 85, 170, 0.6)', // Color of the perimeter
+              lineWidth: 1,
+              fillColor: 'rgba(8, 138, 254, 0.43)'  // Color of the circle
+            }
+          }
+        );
+        group.addObject(area);
+
+        // disable the default draggability of the underlying map
+        // when starting to drag a marker object:
+        group.addEventListener('dragstart', function(ev) {
+          console.log("Start Dragged - Group ID: " + groupID);
+          dragged = true;
+          var target = ev.target;
+
+          var coord = map.screenToGeo(ev.currentPointer.viewportX, ev.currentPointer.viewportY);
+
+          removeArea(groupID);
+
+          if (target instanceof H.map.Marker) {
+            behavior.disable();
+          }
+        }, false);
+
+
+        // re-enable the default draggability of the underlying map
+        // when dragging has completed
+        group.addEventListener('dragend', function(ev) {
+          var target = ev.target;
+          console.log("dragged")
+
+          var coord = map.screenToGeo(ev.currentPointer.viewportX, ev.currentPointer.viewportY);
+
+          if (dragged) {
+            changeArea(groupID, coord.lat, coord.lng);
+          }
+          dragged = false;
+
+          if (target instanceof mapsjs.map.Marker) {
+            behavior.enable();
+          }
+        }, false);
+
+        // Listen to the drag event and move the position of the marker
+        // as necessary
+        group.addEventListener('drag', function(ev) {
+          var target = ev.target;
+          var pointer = ev.currentPointer;
+          // var coord = map.screenToGeo(ev.currentPointer.viewportX, ev.currentPointer.viewportY);
+          // console.log(coord)
+          if (target instanceof mapsjs.map.Marker) {
+            target.setPosition(map.screenToGeo(pointer.viewportX, pointer.viewportY));
+          }
+        }, false);
+
+
+         /* push to array */
+        myMarkers.push({
+          id: markerID,
+          group_id: groupID,
+          group: group,
+          area: area,
+          radius: radius,
+          lat: lat,
+          lng: lng
+        })
+      }
+
+      function init(){
+        initAddLocation();
+        initRemoveMap();
+        initDropMarker();
+        initRemoveMarker();
+        initChangeRadius();
+      }
+
+      init();
+
     });
-    var defaultLayers = platform.createDefaultLayers();
-
-    //Step 2: initialize a map - this map is centered
-    var map = new H.Map(document.getElementById('map1'),
-      defaultLayers.normal.map,{
-      center: {lat:-6.864856, lng:107.579930},
-      zoom: 13
-    });
-
-    var map2 = new H.Map(document.getElementById('map2'),
-      defaultLayers.normal.map,{
-      center: {lat:-6.864856, lng:107.579930},
-      zoom: 13
-    });
-
-    var map3 = new H.Map(document.getElementById('map3'),
-      defaultLayers.normal.map,{
-      center: {lat:-6.864856, lng:107.579930},
-      zoom: 13
-    });
-
-
-    //Step 3: make the map interactive
-    // MapEvents enables the event system
-    // Behavior implements default interactions for pan/zoom (also on mobile touch environments)
-    var behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
-    var behavior2 = new H.mapevents.Behavior(new H.mapevents.MapEvents(map2));
-    var behavior3 = new H.mapevents.Behavior(new H.mapevents.MapEvents(map3));
-
-    // Step 4: Create the default UI:
-    var ui = H.ui.UI.createDefault(map, defaultLayers, 'en-US');
-
-    /* setup click listener */
-    setUpClickListener(map);
-    ButtonEventListener();
   </script>
 </body>
 </html>
