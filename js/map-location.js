@@ -2,7 +2,6 @@ var MapLocation = function (config) {
 	var self = this;
 	self.config = config;
 	self.$container = $('#' + config.id);
-	console.log(config.id)
 	var locationCounter = config.mapCounter;
 	var mapID = 'map-' + config.id;
 
@@ -332,11 +331,17 @@ var MapLocation = function (config) {
 	  ui = H.ui.UI.createDefault(map, defaultLayers, 'en-US');
 	}
 
-	initCreateElement();
-	connection();
-	initDropMarker();
-	initRemoveMarker();
-	initRemoveMap();
-	initChangeRadius();
-	clickListener(map);
+	/* initialize */
+	function init() {
+		initCreateElement();
+		connection();
+		initDropMarker();
+		initRemoveMarker();
+		initRemoveMap();
+		initChangeRadius();
+		clickListener(map);
+	}
+
+	/* run init */
+	init();
 }
