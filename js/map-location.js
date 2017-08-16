@@ -83,18 +83,17 @@ var MapLocation = function (config) {
 	  	var group = new H.map.Group();
 	  	var groupID = group.getId();
 
+	  	/* event tap for zoom  */
+	  	/*group.addEventListener('tap', function(evt){
+	  		var target = evt.target;
+	  		var maxZoom = target.getData().maxZoom;
+  		    var cameraData = map.getCameraDataForBounds(evt.target.getBounds());
+  		    map.setZoom(Math.min(cameraData.zoom, maxZoom), true);
+  		    map.setCenter(cameraData.position, true);
+	  	});*/
+
 	  	/* add group to the map object */
 	  	map.addObject(group);
-
-	  	/* event tap for bubble info */
-	  	group.addEventListener('tap', function (evt) {
-	    	selectedGroupID = group.getId();
-	    	var bubble =  new H.ui.InfoBubble(evt.target.getPosition(), {
-	      		content: evt.target.getData()
-	    	});
-	    	// show info bubble
-	    	ui.addBubble(bubble);
-	  	}, false);
 
 	  	var html = `
 	                <div class="info-container clearfix">
@@ -113,12 +112,27 @@ var MapLocation = function (config) {
 	              `;
 
 	  	// create marker
-	  	var marker = new H.map.Marker({lat:lat, lng:lng});
+	  	var pathIcon = 'css/cursor/location-droppin.png';
+	  	var icon = new H.map.Icon(pathIcon);
+  		var coords = {lat:lat, lng:lng};
+	  	var marker = new H.map.Marker(coords, {icon: icon});
 
 	  	// Ensure that the marker can receive drag events
 	  	marker.draggable = true;
 	  	marker.setData(html);
 	  	group.addObject(marker);
+
+	  	/* event tap for bubble info */
+	  	marker.addEventListener('tap', function (evt) {
+	  		var target = evt.target;
+  		    /* set selected group id */
+	    	selectedGroupID = group.getId();
+	    	var bubble =  new H.ui.InfoBubble(target.getPosition(), {
+	      		content: target.getData()
+	    	});
+	    	// show info bubble
+	    	ui.addBubble(bubble);
+	  	}, false);
 
 	  	// create area in marker
 	  	var area = new H.map.Circle(
@@ -130,7 +144,7 @@ var MapLocation = function (config) {
 	      		style: {
 			        strokeColor: 'rgba(55, 85, 170, 0.6)', // Color of the perimeter
 			        lineWidth: 1,
-			        fillColor: 'rgba(8, 138, 254, 0.43)'  // Color of the circle
+			        fillColor: 'rgba(169, 205, 238, 0.43)'  // Color of the circle
 	      		}
 	    	}
 	  	);
@@ -266,7 +280,7 @@ var MapLocation = function (config) {
 	          style: {
 	            strokeColor: 'rgba(55, 85, 170, 0.6)', // Color of the perimeter
 	            lineWidth: 1,
-	            fillColor: 'rgba(8, 138, 254, 0.43)'  // Color of the circle
+	            fillColor: 'rgba(169, 205, 238, 0.43)'  // Color of the circle
 	          }
 	        }
 	      );
@@ -303,7 +317,7 @@ var MapLocation = function (config) {
 	          style: {
 	            strokeColor: 'rgba(55, 85, 170, 0.6)', // Color of the perimeter
 	            lineWidth: 1,
-	            fillColor: 'rgba(8, 138, 254, 0.43)'  // Color of the circle
+	            fillColor: 'rgba(169, 205, 238, 0.43)'  // Color of the circle
 	          }
 	        }
 	      );

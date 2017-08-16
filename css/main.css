@@ -16,7 +16,7 @@
 	-webkit-zoom-grabbing
 }
 .map-location.targetting {
-	cursor: url(cursor/my-cursor.png) 18 18, pointer !important;
+	cursor: url(cursor/location-droppin.png) 17 45, pointer !important;
 }
 .info-container {
   	min-width: 500px !important;
