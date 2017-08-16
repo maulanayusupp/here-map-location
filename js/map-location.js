@@ -87,15 +87,6 @@ var MapLocation = function (config) {
 	  	var group = new H.map.Group();
 	  	var groupID = group.getId();
 
-	  	/* event tap for zoom  */
-	  	/*group.addEventListener('tap', function(evt){
-	  		var target = evt.target;
-	  		var maxZoom = target.getData().maxZoom;
-  		    var cameraData = map.getCameraDataForBounds(evt.target.getBounds());
-  		    map.setZoom(Math.min(cameraData.zoom, maxZoom), true);
-  		    map.setCenter(cameraData.position, true);
-	  	});*/
-
 	  	/* add group to the map object */
 	  	map.addObject(group);
 
@@ -117,13 +108,13 @@ var MapLocation = function (config) {
 	                </div>
 	              `;
 
-	  	// create marker
+	  	/* create marker */
 	  	var pathIcon = 'css/cursor/location-droppin.png';
 	  	var icon = new H.map.Icon(pathIcon);
   		var coords = {lat:lat, lng:lng};
 	  	var marker = new H.map.Marker(coords, {icon: icon});
 
-	  	// Ensure that the marker can receive drag events
+	  	/* Ensure that the marker can receive drag events */
 	  	marker.draggable = true;
 	  	marker.setData(html);
 	  	group.addObject(marker);
@@ -136,15 +127,14 @@ var MapLocation = function (config) {
 	    	var bubble =  new H.ui.InfoBubble(target.getPosition(), {
 	      		content: target.getData()
 	    	});
-	    	// show info bubble
+
+	    	/* show bubble */
 	    	ui.addBubble(bubble);
 	  	}, false);
 
-	  	// create area in marker
+	  	/* create area in marker */
 	  	var area = new H.map.Circle(
-	    	// The central point of the circle
 	    	{lat:lat, lng:lng},
-	    	// The radius of the circle in meters
 	    	radius,
 	    	{
 	      		style: {
@@ -156,8 +146,7 @@ var MapLocation = function (config) {
 	  	);
 	  	group.addObject(area);
 
-	  	// disable the default draggability of the underlying map
-	  	// when starting to drag a marker object:
+	  	/* when starting to drag a marker object */
 	  	group.addEventListener('dragstart', function(ev) {
 	    	console.log("Start Dragged - Group ID: " + groupID);
 	    	selectedGroupID = group.getId();
@@ -172,8 +161,7 @@ var MapLocation = function (config) {
 	  	}, false);
 
 
-	  	// re-enable the default draggability of the underlying map
-	  	// when dragging has completed
+	  	/* when dragging has completed */
 	  	group.addEventListener('dragend', function(ev) {
 	    	var target = ev.target;
 	    	console.log("dragged")
@@ -190,13 +178,13 @@ var MapLocation = function (config) {
 	    	}
 	  	}, false);
 
-	  	// Listen to the drag event and move the position of the marker
-	  	// as necessary
+	  	/* shile dragging */
 	  	group.addEventListener('drag', function(ev) {
 	    	var target = ev.target;
 	    	var pointer = ev.currentPointer;
-	    	// var coord = map.screenToGeo(ev.currentPointer.viewportX, ev.currentPointer.viewportY);
-	    	// console.log(coord)
+	    	/* get coordinate */
+	    	var coord = map.screenToGeo(ev.currentPointer.viewportX, ev.currentPointer.viewportY);
+
 	    	if (target instanceof mapsjs.map.Marker) {
 	      		target.setPosition(map.screenToGeo(pointer.viewportX, pointer.viewportY));
 	    	}
@@ -281,7 +269,6 @@ var MapLocation = function (config) {
 
 	/* on change radius in marker */
 	function onChangeRadius() {
-	  // Add the click event listener.
 	  for (var i = 0; i < myMarkers.length; i++) {
 	    var current = myMarkers[i];
 
