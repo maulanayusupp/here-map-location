@@ -102,7 +102,9 @@ var MapLocation = function (config) {
 	  	var html = `
 	                <div class="info-container clearfix">
 	                  <div class="float-left">
-	                      <div class="btn btn-sm btn-warning">Pixel House Studio</div>
+	                      	<a href=\'http://pixelhouse.id/\' target="blank">
+		                      <div class="btn btn-sm btn-warning">Pixel House ID</div>
+		                    </a>
 	                  </div>
 	                  <div class="float-right">
 	                    <a href=\'http://managix.id/\' target="blank">
@@ -111,7 +113,7 @@ var MapLocation = function (config) {
 	                  </div>
 	                </div>
 	                <div>
-	                  Jl. Gegerkalong Tonggoh III No.15, Gegerkalong, Sukasari, Kota Bandung, Jawa Barat 40153, Indonesia
+						<div class="label-lat-lng">${lat}, ${lng}</div>
 	                </div>
 	              `;
 

@@ -19,8 +19,11 @@
 	cursor: url(cursor/location-droppin.png) 17 45, pointer !important;
 }
 .info-container {
- min-width: 500px !important;
- max-width: 700px !important;
+ min-width: 250px !important;
+ /*max-width: 700px !important;*/
+}
+.label-lat-lng {
+  font-size: 10px;
 }
 .list-marker-location {
   list-style-type: none;
