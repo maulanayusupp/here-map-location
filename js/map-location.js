@@ -202,7 +202,7 @@ var MapLocation = function (config) {
 	      	var lng = coords.lng;
 	      	if (dropped) {
 		      	addDraggableMarker(map, behavior, lat, lng);
-		      	checkDropMarker();
+		      	// checkDropMarker();
 		    }
 	    }, false);
 	}
