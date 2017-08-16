@@ -35,16 +35,20 @@ var MapLocation = function (config) {
 			                    <div class="card-body">
 			                      	<div class="row">
 			                        	<div class="col-sm-2">
-			                          	<div class="btn btn-sm btn-primary btn-block map-drop-in" >Drop In</div>
-			                          	<div class="btn btn-sm btn-danger btn-block map-remove-marker">Remove Marker</div>
-			                          	<div class="btn btn-sm btn-warning btn-block map-change-radius" >Change Radius</div>
+				                          	<div class="btn btn-sm btn-primary btn-block map-drop-in" >Drop In</div>
+				                          	<div class="btn btn-sm btn-danger btn-block map-remove-marker">Remove Marker</div>
+				                          	<div class="btn btn-sm btn-warning btn-block map-change-radius" >Change Radius</div>
+				                        </div>
+                                        <div class="col-sm-7">
+                                          	<div id="map-container">
+                                        	    <div id="${mapID}" class="map-location"></div>
+                                        	</div>
+                                        </div>
+                                        <div class="col-sm-3">
+                							<ul class="list-marker-location">
+                							</ul>
+                                        </div>
 			                        </div>
-			                        <div class="col-sm-10">
-			                          	<div id="map-container">
-			                        	    <div id="${mapID}" class="map-location" /></div>
-			                        	</div>
-			                        </div>
-			                      </div>
 			                    </div>
 		                  	</div>
 	                	</div>
@@ -216,9 +220,20 @@ var MapLocation = function (config) {
 	      	var lng = coords.lng;
 	      	if (dropped) {
 		      	addDraggableMarker(map, behavior, lat, lng);
-		      	// checkDropMarker();
+		      	checkDropMarker();
+		      	checkMarkerData();
 		    }
 	    }, false);
+	}
+
+	/* check marker data */
+	function checkMarkerData() {
+		self.$container.find('.marker-item').remove();
+		for (var i = 0; i < myMarkers.length; i++) {
+			var current = myMarkers[i];
+			var dom = `<li class="marker-item">${current.lat}, ${current.lng}</li>`;
+			$('.list-marker-location').append(dom);
+		}
 	}
 
 	/* function mouse enter the map */
@@ -250,6 +265,7 @@ var MapLocation = function (config) {
 	      console.log("remove")
 	      map.removeObject(current.group);
 	      myMarkers.splice(i, 1);
+	      checkMarkerData();
 	    }
 	  }
 	}

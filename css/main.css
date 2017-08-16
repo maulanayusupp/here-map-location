@@ -1,24 +1,31 @@
 .map-container {
-  	padding-bottom: 10px;
+ padding-bottom: 10px;
 }
 .map-variation-component:first-child .btn-remove-map-location {
-  	display: none;
+ display: none;
 }
 .map-location {
-  	width: 100%;
-  	height: 300px;
-  	background: grey;
-  	z-index: 99999;
-  	cursor: pointer;
-  	-webkit-zoom-in
-	-webkit-zoom-out
-	-webkit-zoom-grab
-	-webkit-zoom-grabbing
+ width: 100%;
+ height: 300px;
+ background: grey;
+ z-index: 99999;
+ cursor: pointer;
+ -webkit-zoom-in
+ -webkit-zoom-out
+ -webkit-zoom-grab
+ -webkit-zoom-grabbing
 }
 .map-location.targetting {
 	cursor: url(cursor/location-droppin.png) 17 45, pointer !important;
 }
 .info-container {
-  	min-width: 500px !important;
-  	max-width: 700px !important;
+ min-width: 500px !important;
+ max-width: 700px !important;
+}
+.list-marker-location {
+  list-style-type: none;
+  margin-left: -54px;
+}
+.list-marker-location .marker-item {
+  font-size: 10px;
 }
