@@ -56,14 +56,7 @@ var MapLocation = function (config) {
 	/* init drop marker */
 	function initDropMarker(){
 	  	self.$container.find('.map-drop-in').on('click', function(event) {
-	 		var _item = $(this);
-	   		if (dropped) {
-	   			dropped = false;
-	   			_item.html('Drop In');
-	   		} else {
-	   			dropped = true;
-	   			_item.html('Droped');
-	   		}
+	 		checkDropMarker();
 	  	});
 	}
 
@@ -72,9 +65,11 @@ var MapLocation = function (config) {
    		if (dropped) {
    			dropped = false;
    			self.$container.find('.map-drop-in').html('Drop In');
+   			self.$container.find('.map-location').removeClass('targetting');
    		} else {
    			dropped = true;
    			self.$container.find('.map-drop-in').html('Droped');
+   			self.$container.find('.map-location').addClass('targetting');
    		}
 	}
 
@@ -200,7 +195,7 @@ var MapLocation = function (config) {
 	}
 
 	/* click with mouse listener */
-	function clickListener(map) {
+	function mouseClickListener(map) {
 		map.addEventListener('tap', function (evt) {
 			var coords =  map.screenToGeo(evt.currentPointer.viewportX, evt.currentPointer.viewportY);
 	      	var lat = coords.lat;
@@ -211,6 +206,20 @@ var MapLocation = function (config) {
 		    }
 	    }, false);
 	}
+
+	/* function mouse enter the map */
+	function pointerEnteredMap() {
+		map.addEventListener('pointerenter', function (evt) {
+			/* simpen ipen didieu wa */
+		}, false);
+	};
+
+	/* function mouse left the map */
+	function pointerLeftMap() {
+		map.addEventListener('pointerleave', function (evt) {
+			/* simpen ipen didieu wa */
+		}, false);
+	};
 
 	/* init remove marker */
 	function initRemoveMarker(){
@@ -350,7 +359,9 @@ var MapLocation = function (config) {
 		initRemoveMarker();
 		initRemoveMap();
 		initChangeRadius();
-		clickListener(map);
+		mouseClickListener(map);
+		pointerEnteredMap();
+		pointerLeftMap();
 	}
 
 	/* run init */
