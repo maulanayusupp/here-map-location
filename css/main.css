@@ -1,5 +1,5 @@
 .map-container {
- padding-bottom: 10px;
+ padding: 15px 0px;
 }
 .map-variation-component:first-child .btn-remove-map-location {
  display: none;
