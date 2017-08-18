@@ -103,9 +103,6 @@ var MapLocation = function (config) {
 	                    </a>
 	                  </div>
 	                </div>
-	                <div>
-						<div class="label-lat-lng">${lat}, ${lng}</div>
-	                </div>
 	              `;
 
 	  	/* create marker */
@@ -167,6 +164,7 @@ var MapLocation = function (config) {
 	    	console.log("dragged")
 
 	    	var coord = map.screenToGeo(ev.currentPointer.viewportX, ev.currentPointer.viewportY);
+	    	changeCoordinate(groupID, coord.lat, coord.lng);
 
 	    	if (dragged) {
 	      		changeArea(groupID, coord.lat, coord.lng);
@@ -184,6 +182,7 @@ var MapLocation = function (config) {
 	    	var pointer = ev.currentPointer;
 	    	/* get coordinate */
 	    	var coord = map.screenToGeo(ev.currentPointer.viewportX, ev.currentPointer.viewportY);
+	    	changeCoordinate(groupID, coord.lat, coord.lng);
 
 	    	if (target instanceof mapsjs.map.Marker) {
 	      		target.setPosition(map.screenToGeo(pointer.viewportX, pointer.viewportY));
@@ -333,7 +332,20 @@ var MapLocation = function (config) {
 	      break;
 	    }
 	  }
-	};
+	}
+
+	/* change coordinate */
+	function changeCoordinate(groupID, lat, lng){
+	  for (var i = 0; i < myMarkers.length; i++) {
+	    var current = myMarkers[i];
+	    if (current.group_id == groupID) {
+	      current.lat = lat;
+	      current.lng = lng;
+	      break;
+	    }
+	  }
+	  checkMarkerData();
+	}
 
 	/* remove map */
 	function initRemoveMap(){
