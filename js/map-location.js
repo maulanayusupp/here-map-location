@@ -221,7 +221,7 @@ var MapLocation = function (config) {
 		for (var i = 0; i < myMarkers.length; i++) {
 			var current = myMarkers[i];
 			var dom = `<li class="marker-item">${current.lat}, ${current.lng}</li>`;
-			$('.list-marker-location').append(dom);
+			self.$container.find('.list-marker-location').append(dom);
 		}
 	}
 
